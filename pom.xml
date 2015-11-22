@@ -53,6 +53,12 @@ LICENSE file.
         <artifactId>google-collections</artifactId>
         <version>1.0</version>
       </dependency>
+      <dependency>
+        <groupId>spy</groupId>
+        <artifactId>spymemcached</artifactId>
+        <version>2.8.1</version>
+        <scope>provided</scope>
+      </dependency>
       <!--
       Nail down slf4j version to 1.6 so that it defaults to no-op logger.
       http://www.slf4j.org/codes.html#StaticLoggerBinder
@@ -84,6 +90,7 @@ LICENSE file.
     <mongodb.version>3.0.3</mongodb.version>
     <mongodb.async.version>2.0.1</mongodb.async.version>
     <orientdb.version>1.0.1</orientdb.version>
+    <memcached.version>2.0.0</memcached.version>
     <redis.version>2.0.0</redis.version>
     <voldemort.version>0.81</voldemort.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -99,7 +106,7 @@ LICENSE file.
     <module>core</module>
     <module>binding-parent</module>
     <!-- all the datastore bindings, lex sorted please -->
-    <module>accumulo</module>
+    <!--<module>accumulo</module>
     <module>aerospike</module>
     <module>cassandra</module>
     <module>cassandra2</module>
@@ -114,13 +121,14 @@ LICENSE file.
     <module>hypertable</module>
     <module>infinispan</module>
     <module>jdbc</module>
-    <module>kudu</module>
+    <module>kudu</module>-->
     <!--<module>mapkeeper</module>-->
-    <module>mongodb</module>
+    <!--module>mongodb</module-->
+    <module>memcached</module>
     <!--module>nosqldb</module-->
-    <module>orientdb</module>
+    <!--module>orientdb</module-->
     <module>redis</module>
-    <module>tarantool</module>
+    <!--<module>tarantool</module>-->
     <!--<module>voldemort</module>-->
   </modules>
 
