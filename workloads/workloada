@@ -28,6 +28,8 @@ workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
 
+fieldlength=4000000
+
 readproportion=0.5
 updateproportion=0.5
 scanproportion=0
