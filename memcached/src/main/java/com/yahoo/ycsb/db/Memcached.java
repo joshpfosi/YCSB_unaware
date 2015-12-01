@@ -31,21 +31,33 @@ public class Memcached extends com.yahoo.ycsb.DB
    * there is one DB instance per client thread.
    */
   public void init() throws DBException {
-    props = getProperties();
-/*
-    String server = props.getProperty("memcached.server");
-  */
-    String server = "localhost";
-    int port = 11211;
-
-    if (server == null)
-      throw new DBException("memcached.server param must be specified");
-
-    try { port = Integer.parseInt(props.getProperty("memcached.port")); }
-    catch (Exception e) {}
+    int port = 8888, numServers = 4, connPerServer = 1; // 2;
 
     try {
-      client = new MemcachedClient(new InetSocketAddress(server, port));
+      List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
+
+      String[] servers = new String[] {
+        // "mem0.dupaware.comp150.emulab.net",
+        // "mem1.dupaware.comp150.emulab.net",
+        // "mem2.dupaware.comp150.emulab.net",
+        // "mem3.dupaware.comp150.emulab.net"
+        "localhost",
+        "localhost",
+        "localhost",
+        "localhost"
+      };
+
+      // NOTE: Order of list is important here -- It must be
+      // [ mem0, mem1, mem2, mem3, mem0, mem1, mem2, mem3, ... ]
+      // not [ mem0, mem0, mem1, mem1, ... ]
+      for (int i = 0; i < connPerServer; i++) {
+        // for (String server : servers) {
+        for (int j = 0; j < numServers; j++) {
+          addrs.add(new InetSocketAddress(servers[j], 8000 + j));
+        }
+      }
+
+      client = new MemcachedClient(addrs);
     } catch (IOException e) { throw new DBException(e); }
   }
 
