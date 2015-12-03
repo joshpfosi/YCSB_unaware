@@ -26,25 +26,31 @@ public class Memcached extends com.yahoo.ycsb.DB
   MemcachedClient client;
   Properties props;
 
+  public static final String PORT_PROPERTY = "memcached.port";
+
   /**
    * Initialize any state for this DB.  Called once per DB instance;
    * there is one DB instance per client thread.
    */
   public void init() throws DBException {
+    props = getProperties();
+
     int port = 8888, numServers = 4, connPerServer = 1; // 2;
+
+    String portString = props.getProperty(PORT_PROPERTY);
+
+    if (portString != null) {
+      port = Integer.parseInt(portString);
+    }
 
     try {
       List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 
       String[] servers = new String[] {
-        // "mem0.dupaware.comp150.emulab.net",
-        // "mem1.dupaware.comp150.emulab.net",
-        // "mem2.dupaware.comp150.emulab.net",
-        // "mem3.dupaware.comp150.emulab.net"
-        "localhost",
-        "localhost",
-        "localhost",
-        "localhost"
+        "memcached0.dup.comp150.emulab.net",
+        "memcached1.dup.comp150.emulab.net",
+        "memcached2.dup.comp150.emulab.net",
+        "memcached3.dup.comp150.emulab.net"
       };
 
       // NOTE: Order of list is important here -- It must be
@@ -53,7 +59,7 @@ public class Memcached extends com.yahoo.ycsb.DB
       for (int i = 0; i < connPerServer; i++) {
         // for (String server : servers) {
         for (int j = 0; j < numServers; j++) {
-          addrs.add(new InetSocketAddress(servers[j], 8000 + j));
+          addrs.add(new InetSocketAddress(servers[j], port));
         }
       }
 
