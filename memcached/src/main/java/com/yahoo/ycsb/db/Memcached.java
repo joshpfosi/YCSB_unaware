@@ -22,9 +22,9 @@ public class Memcached extends com.yahoo.ycsb.DB
 {
   MemcachedClient client;
 
-  public static final String PORT_PROPERTY = "memcached.port";
+  public static final String PORT_PROPERTY    = "memcached.port";
   public static final String SERVERS_PROPERTY = "memcached.servers";
-  public static final String CONNS_PROPERTY = "memcached.connsPerServer";
+  public static final String CONNS_PROPERTY   = "memcached.connsPerServer";
   public static final String THREADS_PROPERTY = "memcached.numThreads";
 
   /**
@@ -35,7 +35,12 @@ public class Memcached extends com.yahoo.ycsb.DB
     Properties props = getProperties();
 
     int port = 8888, connsPerServer = 1, numThreads = 4;
-    String servers[] = { "memcached0.dup.comp150.emulab.net" };
+    String[] servers = {
+      "memcached0.dup.comp150.emulab.net",
+      "memcached1.dup.comp150.emulab.net",
+      "memcached2.dup.comp150.emulab.net",
+      "memcached3.dup.comp150.emulab.net"
+    };
 
     String portString           = props.getProperty(PORT_PROPERTY);
     String serverString         = props.getProperty(SERVERS_PROPERTY);
@@ -44,10 +49,6 @@ public class Memcached extends com.yahoo.ycsb.DB
 
     if (portString != null) {
       port = Integer.parseInt(portString);
-    }
-
-    if (serverString != null) {
-      servers = serverString.split(" ");
     }
 
     if (connsPerServerString != null) {
