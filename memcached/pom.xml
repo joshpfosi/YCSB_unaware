@@ -34,7 +34,7 @@ LICENSE file.
       <id>spy</id>
       <name>Spy Repository</name>
       <layout>default</layout>
-      <url>file://~/</url>
+      <url>file://~/YCSB_aware</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
