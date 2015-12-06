@@ -1,9 +1,6 @@
 // Jacob Leverich <leverich@stanford.edu>, 2011
 // Memcached client for YCSB framework.
 //
-// Properties:
-//   memcached.server=memcached.xyz.com
-//   memcached.port=11211
 
 package com.yahoo.ycsb.db;
 
@@ -24,42 +21,55 @@ import net.spy.memcached.internal.OperationFuture;
 public class Memcached extends com.yahoo.ycsb.DB
 {
   MemcachedClient client;
-  Properties props;
 
-  public static final String PORT_PROPERTY = "memcached.port";
+  public static final String PORT_PROPERTY    = "memcached.port";
+  public static final String SERVERS_PROPERTY = "memcached.servers";
+  public static final String CONNS_PROPERTY   = "memcached.connsPerServer";
+  public static final String THREADS_PROPERTY = "memcached.numThreads";
 
   /**
    * Initialize any state for this DB.  Called once per DB instance;
    * there is one DB instance per client thread.
    */
   public void init() throws DBException {
-    props = getProperties();
+    Properties props = getProperties();
 
-    int port = 8888, numServers = 4, connPerServer = 1; // 2;
+    int port = 8888, connsPerServer = 1, numThreads = 4;
+    String[] servers = {
+      "memcached0.dup.comp150.emulab.net",
+      "memcached1.dup.comp150.emulab.net",
+      "memcached2.dup.comp150.emulab.net",
+      "memcached3.dup.comp150.emulab.net"
+    };
 
-    String portString = props.getProperty(PORT_PROPERTY);
+    String portString           = props.getProperty(PORT_PROPERTY);
+    String serverString         = props.getProperty(SERVERS_PROPERTY);
+    String connsPerServerString = props.getProperty(CONNS_PROPERTY);
+    String numThreadsString     = props.getProperty(THREADS_PROPERTY);
 
     if (portString != null) {
       port = Integer.parseInt(portString);
     }
 
+    if (connsPerServerString != null) {
+      connsPerServer = Integer.parseInt(connsPerServerString);
+    }
+
+    if (numThreadsString != null) {
+      numThreads = Integer.parseInt(numThreadsString);
+    }
+
     try {
       List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
-
-      String[] servers = new String[] {
-        "memcached0.dup.comp150.emulab.net",
-        "memcached1.dup.comp150.emulab.net",
-        "memcached2.dup.comp150.emulab.net",
-        "memcached3.dup.comp150.emulab.net"
-      };
 
       // NOTE: Order of list is important here -- It must be
       // [ mem0, mem1, mem2, mem3, mem0, mem1, mem2, mem3, ... ]
       // not [ mem0, mem0, mem1, mem1, ... ]
-      for (int i = 0; i < connPerServer; i++) {
-        // for (String server : servers) {
-        for (int j = 0; j < numServers; j++) {
-          addrs.add(new InetSocketAddress(servers[j], port));
+      for (int i = 0; i < connsPerServer; i++) {
+        for (int j = 0; j < numThreads; j++) {
+          for (String server : servers) {
+            addrs.add(new InetSocketAddress(server, port));
+          }
         }
       }
 
