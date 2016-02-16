@@ -7,7 +7,6 @@ package com.yahoo.ycsb.db;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.ExecutionException;
 
 import com.yahoo.ycsb.DBException;
@@ -36,17 +35,13 @@ public class Memcached extends com.yahoo.ycsb.DB
     Properties props = getProperties();
 
     int port = 8888, connsPerServer = 1, numThreads = 4;
-    String[] servers = {
-      "memcached0.dup.comp150.emulab.net",
-      "memcached1.dup.comp150.emulab.net",
-      "memcached2.dup.comp150.emulab.net",
-      "memcached3.dup.comp150.emulab.net"
-    };
 
     String portString           = props.getProperty(PORT_PROPERTY);
     String serverString         = props.getProperty(SERVERS_PROPERTY);
     String connsPerServerString = props.getProperty(CONNS_PROPERTY);
     String numThreadsString     = props.getProperty(THREADS_PROPERTY);
+
+    String[] servers = serverString.split(" ");
 
     if (portString != null) {
       port = Integer.parseInt(portString);
@@ -102,36 +97,8 @@ public class Memcached extends com.yahoo.ycsb.DB
   @Override
   public Status read(String table, String key, Set<String> fields,
                   HashMap<String,ByteIterator> result) {
-    // HashMap<String, byte[]> values = (HashMap<String, byte[]>) client.get(table + ":" + key);
-
-    Future<Object> f     = client.asyncGet(table + ":" + key);
-    Future<Object> f_dup = client.asyncGet("dup__" + table + ":" + key);
-
-    HashMap<String, byte[]> values = null;
-    
-    while (true) {
-      if (f.isDone()) {
-        System.out.print("Primary is fetched\n");
-
-        try { values = (HashMap<String, byte[]>) f.get(); }
-        catch (InterruptedException e) { return Status.ERROR; }
-        catch (ExecutionException e) { return Status.ERROR; }
-
-        f_dup.cancel(true);
-        break;
-      }
-      
-      if (f_dup.isDone()) {
-        System.out.print("Duplicate is fetched\n");
-        
-        try { values = (HashMap<String, byte[]>) f_dup.get(); }
-        catch (InterruptedException e) { return Status.ERROR; }
-        catch (ExecutionException e) { return Status.ERROR; }
-
-        f.cancel(true);
-        break;
-      }
-    }
+    HashMap<String, byte[]> values = 
+      (HashMap<String, byte[]>) client.get(table + ":" + key);
 
     if (values == null) return Status.NOT_FOUND;
     if (values.keySet().isEmpty()) return Status.NOT_FOUND;
@@ -189,8 +156,6 @@ public class Memcached extends com.yahoo.ycsb.DB
 
     OperationFuture<Boolean> f =
       client.set(table + ":" + key, 3600, new_values);
-    
-    client.set("dup__" + table + ":" + key, 3600, new_values);
 
     try { return f.get() ? Status.OK : Status.ERROR; }
     catch (InterruptedException e) { return Status.ERROR; }

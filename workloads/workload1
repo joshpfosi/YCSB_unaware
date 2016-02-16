@@ -13,5 +13,4 @@ insertproportion=0
 
 insertorder=ordered
 
-requestdistribution=zipfian
-
+requestdistribution=latest
